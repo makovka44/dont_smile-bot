@@ -11,6 +11,9 @@ stop = 1
 # Replace YOUR_TOKEN with your own Discord bot token
 TOKEN = os.getenv("moj_token")
 
+IMAGE_BETA = os.getenv("beta_server")
+IMAGE_BETA_CHANNEL = os.getenv("beta_channel")
+
 # Replace YOUR_USER_ID with your own Discord user ID
 USER_ID = os.getenv("USER_ID")
 JURIJ = os.getenv("JURIJ")
@@ -20,6 +23,17 @@ MATIJA = os.getenv("MATIJA")
 LIN = os.getenv("LIN")
 
 client = discord.Client(intents=discord.Intents.default())
+
+async def send_message(server, channel):
+    server = client.get_guild(server)
+    channel = server.get_channel(channel)
+    message = 'This is a message from your Python bot! '
+    # Get the user object for the specified user ID
+    user = await client.fetch_user(USER_ID)
+    # Mention the user in the message
+    message += user.mention
+    await channel.send(message)
+
 
 async def my_background_task():
     global stop
@@ -48,6 +62,10 @@ async def on_ready():
     await client.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.playing, name="Slova je zakon!"))
     await asyncio.sleep(5)
 
+@client.event
+async def send_channel(server, channel):
+    server = client.get_guild(server)
+    channel = server.get_channel(channel)
     
 @client.event
 async def on_message(message):
@@ -87,4 +105,15 @@ async def on_message(message):
     elif "cas" in message.content.lower():
         await send_dm(datetime.datetime.now())
         print(datetime.datetime.now())
+    
+    if message.author == client.user:
+        return
+    if 'maj' in message.content.lower():
+        user = message.author
+        channel = message.channel
+        response = f'{user.mention}, you mentioned me!'
+        await channel.send(response)
+
+    
+    
 client.run(TOKEN)
