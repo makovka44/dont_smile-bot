@@ -38,7 +38,7 @@ async def send_dm(message):
 
 async def send_spam(user):
     message="""
-    @
+    @majmohar
     """
 
 @client.event
