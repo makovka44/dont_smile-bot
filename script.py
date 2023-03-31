@@ -2,6 +2,7 @@ import discord
 import asyncio
 import datetime
 import os
+import dotenv
 
 from dotenv import load_dotenv
 load_dotenv()
