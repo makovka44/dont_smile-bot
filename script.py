@@ -22,6 +22,7 @@ LIN = os.getenv("LIN")
 
 client = discord.Client(intents=discord.Intents.default())
 
+
 async def my_background_task():
     global stop
     await client.wait_until_ready()
@@ -36,10 +37,19 @@ async def send_dm(message):
     user = await client.fetch_user(USER_ID)
     await user.send(message)
 
+
 async def send_spam(user):
-    message="""
-    @majmohar
-    """
+    message=""
+    #Naredi neko spotročilo, ki ga potem pošlje
+
+    for i in range(1, 10):
+        stvar_za_prilepit=f"<@{user}\n>"
+        message+=stvar_za_prilepit
+    print(message)
+    user = await client.fetch_user(user)
+    await user.send(message)
+   
+
 
 @client.event
 async def on_ready():
@@ -49,7 +59,7 @@ async def on_ready():
     await client.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.playing, name="Slova je zakon!"))
     await asyncio.sleep(5)
 
-    
+
 @client.event
 async def on_message(message):
     global stop, USER_ID
@@ -84,7 +94,7 @@ async def on_message(message):
         USER_ID = MAJ
     elif "pojdi k linu" in message.content.lower():
         await send_dm("**Adijos!**")
-        USER_ID = LIN 
+        USER_ID = LIN
     elif "cas" in message.content.lower():
         await send_dm(datetime.datetime.now())
         print(datetime.datetime.now())
