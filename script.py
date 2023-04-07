@@ -14,6 +14,9 @@ stop = 0
 # Replace YOUR_TOKEN with your own Discord bot token
 TOKEN = os.getenv("moj_token")
 
+IMAGE_BETA = os.getenv("beta_server")
+IMAGE_BETA_CHANNEL = os.getenv("beta_channel")
+
 # Replace YOUR_USER_ID with your own Discord user ID
 USER_ID = os.getenv("USER_ID")
 JURIJ = os.getenv("JURIJ")
@@ -23,6 +26,16 @@ MATIJA = os.getenv("MATIJA")
 LIN = os.getenv("LIN")
 
 client = discord.Client(intents=discord.Intents.default())
+
+async def send_message(server, channel):
+    server = client.get_guild(server)
+    channel = server.get_channel(channel)
+    message = 'This is a message from your Python bot! '
+    # Get the user object for the specified user ID
+    user = await client.fetch_user(USER_ID)
+    # Mention the user in the message
+    message += user.mention
+    await channel.send(message)
 
 
 async def my_background_task():
@@ -63,6 +76,10 @@ async def on_ready():
     await asyncio.sleep(1)
     print("status urejen")
 
+@client.event
+async def send_channel(server, channel):
+    server = client.get_guild(server)
+    channel = server.get_channel(channel)
 
 @client.event
 async def on_message(message):
