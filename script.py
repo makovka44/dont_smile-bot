@@ -1,10 +1,15 @@
 import discord
 import asyncio
+import json
 
 from datetime import datetime
+from discord.ext import commands
 
 datetime.today()
 import os
+
+intents = discord.Intents(members=True)
+client = commands.Bot(command_prefix="!", intents=intents)
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -13,6 +18,9 @@ stop = 0
 
 # Replace YOUR_TOKEN with your own Discord bot token
 TOKEN = os.getenv("moj_token")
+
+channel_id = 0
+sender_id = 0
 
 IMAGE_BETA = os.getenv("beta_server")
 IMAGE_BETA_CHANNEL = os.getenv("beta_channel")
@@ -40,6 +48,9 @@ async def send_message(server, channel):
     # Mention the user in the message
     message += user.mention
     await channel.send(message)
+async def send_channel(channel, message):
+    channel = client.get_channel(channel)
+    await channel.send(message)
 
 
 async def my_background_task():
@@ -55,6 +66,10 @@ async def send_dm(message):
     user = await client.fetch_user(USER_ID)
     await user.send(message)
 
+async def get_sender_id(message):
+    sender_id = message.author.id
+    print(sender_id)
+    return sender_id
 
 async def send_spam(user):
     print("trying to spam")
@@ -69,6 +84,10 @@ async def send_spam(user):
     await user.send(message)
     print("sent spam")
    
+async def get_channel_id(message):
+    channel_id = message.channel.id
+    print(channel_id)
+    return channel_id
 
 
 @client.event
@@ -81,9 +100,8 @@ async def on_ready():
     print("status urejen")
 
 @client.event
-async def send_channel(server, channel, message):
-    server = client.get_guild(server)
-    channel = server.get_channel(channel)
+async def send_channel(channel, message):
+    channel = client.get_channel(channel)
     channel.send(message)
 
 @client.event
@@ -93,7 +111,8 @@ async def on_message(message):
     # Ignore messages sent by the bot itself
     if message.author == client.user:
         return
-
+    channel_id= await get_channel_id(message)
+    sender_id = await get_sender_id(message)
     # Respond with a custom message if a specific phrase is mentioned in the message
     if 'maj .' in message.content.lower():
         await message.channel.send(f'Govorim o {message.author.mention}!')
@@ -143,14 +162,14 @@ async def on_message(message):
         USER_ID = VAL
         print("val")
     elif "/spamaj" in message.content.lower():
-        server = client.get_guild(SERVER)
-        if server is None:
-            print(f'Error: could not find server with ID {SERVER}')
-            return
-        channel = server.get_channel(CHANNEL)
-        if channel is None:
-            print(f'Error: could not find channel with ID {CHANNEL}')
-            return
-        await send_channel(SERVER, CHANNEL, send_spam(VAL))
-        print("sent spam in channel")
+        print("spamanje")
+
+
+@client.event
+async def meme(ctx):
+    content = get("https://meme-api.herokuapp.com/gimme").text
+    data = json.loads(content,)
+    meme = discord.Embed(title=f"{data['title']}", Color = discord.Color.random()).set_image(url=f"{data['url']}")
+    await ctx.reply(embed=meme)
+
 client.run(TOKEN)
