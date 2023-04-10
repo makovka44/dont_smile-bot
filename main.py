@@ -1,31 +1,29 @@
 import discord
-import os
-
+import requests
 from discord.ext import commands
+import json
+import os
 from dotenv import load_dotenv
-
-IMAGE_BETA = os.getenv("beta_server")
-IMAGE_BETA_CHANNEL = os.getenv("beta_channel")
+import random
+import aiohttp
 
 load_dotenv()
-TOKEN = os.getenv("moj_token")
 
 intents = discord.Intents.default()
 intents.members = True
-intents.messages = True
-bot = commands.Bot(command_prefix='!', intents=intents)
 
-@bot.event
-async def on_ready():
-    print(f'Logged in as {bot.user}')
-    channel = bot.get_channel(1042465386945314868)
-    await channel.send('hello') 
+bot = commands.Bot(command_prefix='/', intents=intents)
+
+TOKEN = os.getenv("moj_token")
 
 @bot.command()
-async def _send(ctx):
-    guild = bot.get_guild(IMAGE_BETA) # Replace IMAGE_BETA with your server ID
-    channel = guild.get_channel(IMAGE_BETA_CHANNEL) # Replace IMAGE_BETA_CHANNEL with your channel ID
-    await channel.send('Hello, world!')
-    await print("send")
+async def meme(ctx):
+    embed = discord.Embed(title="", description="")
+
+    async with aiohttp.ClientSession() as cs:
+        async with cs.get('https://www.reddit.com/r/dankmemes/new.json?sort=hot') as r:
+            res = await r.json()
+            embed.set_image(url=res['data']['children'][random.randint(0, 25)]['data']['url'])
+            await ctx.send(embed=embed)
 
 bot.run(TOKEN)

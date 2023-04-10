@@ -1,7 +1,7 @@
 import discord
 import asyncio
-import json
-import requests
+import aiohttp
+import random
 
 from datetime import datetime
 from discord.ext import commands
@@ -105,67 +105,41 @@ async def send_channel(channel, message):
     channel = client.get_channel(channel)
     channel.send(message)
 
+async def send_meme(channel):
+    embed = discord.Embed(title="", description="")
+
+    async with aiohttp.ClientSession() as cs:
+        async with cs.get('https://www.reddit.com/r/dankmemes/new.json?sort=hot') as r:
+            res = await r.json()
+            embed.set_image(url=res['data']['children'][random.randint(0, 25)]['data']['url'])
+            await channel.send(embed=embed)
 
 @client.event
 async def on_message(message):
     global stop, USER_ID
+    channel = client.get_channel(message.channel.id)
     print(message.content)
     # Ignore messages sent by the bot itself
     if message.author == client.user:
         return
     # Respond with a custom message if a specific phrase is mentioned in the message
-    if 'maj .' in message.content.lower():
+    if 'maj' in message.content.lower():
         await message.channel.send(f'Govorim o {message.author.mention}!')
         print("omenil sem maja")
-
-    if message.content.lower() == "/meme":
-        print("trying meme")    
-        channel = await get_channel_id(message)
-        content = requests.get("https://meme-api.herokuapp.com/gimme").text
-        data = json.loads(content)
-        meme = discord.Embed(title=f"{data['title']}", color=discord.Color.random())
-        meme.set_image(url=f"{data['url']}")
-        await message.channel.send(embed=meme)
-
-    elif '/stop' in message.content.lower():
-        stop = 1
-        await message.channel.send(f'končal sem!')
-        print("končal sem")
+    elif "/meme-me" in message.content.lower():
+        await send_meme(channel)
 
     elif '/nadaljuj' in message.content.lower():
         await message.channel.send(f'začenjam')
         print("začenjam")
         stop = 0
 
-    elif "/pojdi k juriju" in message.content.lower():
-        await send_dm("**Adijos!**")
-        USER_ID = JURIJ
-        print("jurij")
-    elif "/pojdi k jerneju" in message.content.lower():
-        await send_dm("**Adijos!**")
-        USER_ID = JERNEJ
-        print("jernej")
-    elif "/pojdi k matiju" in message.content.lower():
-        await send_dm("**Adijos!**")
-        USER_ID = MATIJA
-        print("matija")
-    elif "/pridi nazaj" in message.content.lower():
-        USER_ID = MAJ
-        await send_dm("**Hello!**")
-        print("maj")
-    elif "/pojdi k linu" in message.content.lower():
-        await send_dm("**Adijos!**")
-        USER_ID = LIN
-        print("lin")
     elif "/čas" in message.content.lower():  
         await send_dm(f"Čas je {datetime.today()}")
         print(datetime.today())
     elif "/spam me" in message.content.lower():
         await send_spam(USER_ID)
         print("sent spam")
-    elif "/val" in message.content.lower():
-        USER_ID = VAL
-        print("val")
     elif "/spamaj" in message.content.lower():
         print("spamanje")
 
