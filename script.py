@@ -1,6 +1,7 @@
 import discord
 import asyncio
 import json
+import requests
 
 from datetime import datetime
 from discord.ext import commands
@@ -104,6 +105,7 @@ async def send_channel(channel, message):
     channel = client.get_channel(channel)
     channel.send(message)
 
+
 @client.event
 async def on_message(message):
     global stop, USER_ID
@@ -111,16 +113,19 @@ async def on_message(message):
     # Ignore messages sent by the bot itself
     if message.author == client.user:
         return
-    channel_id= await get_channel_id(message)
-    sender_id = await get_sender_id(message)
     # Respond with a custom message if a specific phrase is mentioned in the message
     if 'maj .' in message.content.lower():
         await message.channel.send(f'Govorim o {message.author.mention}!')
         print("omenil sem maja")
 
-    if '/meme' in message.content.lower():
-        await message.channel.send(f'Govorim o {message.author.mention}!')
-        print("omenil sem maja")
+    if message.content.lower() == "/meme":
+        print("trying meme")    
+        channel = await get_channel_id(message)
+        content = requests.get("https://meme-api.herokuapp.com/gimme").text
+        data = json.loads(content)
+        meme = discord.Embed(title=f"{data['title']}", color=discord.Color.random())
+        meme.set_image(url=f"{data['url']}")
+        await message.channel.send(embed=meme)
 
     elif '/stop' in message.content.lower():
         stop = 1
@@ -165,11 +170,5 @@ async def on_message(message):
         print("spamanje")
 
 
-@client.event
-async def meme(ctx):
-    content = get("https://meme-api.herokuapp.com/gimme").text
-    data = json.loads(content,)
-    meme = discord.Embed(title=f"{data['title']}", Color = discord.Color.random()).set_image(url=f"{data['url']}")
-    await ctx.reply(embed=meme)
 
 client.run(TOKEN)
