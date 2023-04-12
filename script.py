@@ -113,10 +113,12 @@ async def on_ready():
 @client.event
 async def send_channel(channel, message):
     channel = client.get_channel(channel)
-    channel.send(message)
+    print(channel, message)
+    await channel.send(message)
 
-async def send_meme(channel):
-    embed = discord.Embed(title="", description="")
+async def send_meme(channel, message):
+    description = (f"<@{message.author.id}>")
+    embed = discord.Embed(title="Meme", description=description)
 
     async with aiohttp.ClientSession() as cs:
         async with cs.get('https://www.reddit.com/r/terriblefacebookmemes/hot.json?sort=hot') as r:
@@ -126,16 +128,23 @@ async def send_meme(channel):
             await channel.send(embed=embed)
 
 async def bot_sleep(time,message):
-    await asyncio.sleep(1)
+    #await asyncio.sleep(1)
     async with message.channel.typing():
             await asyncio.sleep(time)
+
+async def send_8ball(channel):
+    seznam_odzivov = ["Eroor 404", "It is certain.", "It is decidely so.", "Without a doubt.", "Yes, definetly.", "You may rely on it", "A I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Sign point yes.", "Reply hazy, try again.", "Ask again later.", "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtfull."]
+    message = random.choice(seznam_odzivov)
+    print("message izbran")
+    await send_channel(channel, message)
 
 @client.event
 async def on_message(message):
     print(message)
     lin=message.channel
     global stop, USER_ID
-    channel = client.get_channel(message.channel.id)
+    channel = message.channel.id
+    print(channel)
     print(message.content)
     # Ignore messages sent by the bot itself
     if message.author == client.user:
@@ -146,9 +155,15 @@ async def on_message(message):
         print("omenil sem maja")
     elif "/meme-me" in message.content.lower():
         await bot_sleep(3,message)
-        await send_meme(channel)
-    elif isinstance(message, discord.Message):
-        if "/spam" in message.content.lower():
+        await send_meme(message.channel, message)
+
+    elif "/ask-me" in message.content.lower():
+        await bot_sleep(3, message)
+        seznam_odzivov = ["Eroor 404", "It is certain.", "It is decidely so.", "Without a doubt.", "Yes, definetly.", "You may rely on it", "A I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Sign point yes.", "Reply hazy, try again.", "Ask again later.", "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtfull."]
+        message = random.choice(seznam_odzivov)
+        print("message izbran")
+        await send_channel(channel, message)    
+    elif "/spam" in message.content.lower():
             message=" "
             uporabnik=str(message.content.split(" ")[2])
             stevilo=str(message.content.split(" ")[3])
