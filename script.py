@@ -18,18 +18,8 @@ client = discord.Client(intents=intents)
 from dotenv import load_dotenv
 load_dotenv()
 
-stop = 0
-
-# Replace YOUR_TOKEN with your own Discord bot token
 TOKEN = os.getenv("moj_token")
 
-channel_id = 0
-sender_id = 0
-
-IMAGE_BETA = os.getenv("beta_server")
-IMAGE_BETA_CHANNEL = os.getenv("beta_channel")
-
-# Replace YOUR_USER_ID with your own Discord user ID
 USER_ID = os.getenv("USER_ID")
 JURIJ = os.getenv("JURIJ")
 MAJ = os.getenv("MAJ")
@@ -40,31 +30,15 @@ VAL = os.getenv("VAL")
 JAKA = os.getenv("JAKA")
 URBAN = os.getenv("URBAN")
 
-SERVER = os.getenv("g1a")
-CHANNEL = os.getenv("spam")
-
-
-async def send_message(server, channel):
-    server = client.get_guild(server)
-    channel = server.get_channel(channel)
-    message = 'This is a message from your Python bot! '
-    # Get the user object for the specified user ID
-    user = await client.fetch_user(USER_ID)
-    # Mention the user in the message
-    message += user.mention
-    await channel.send(message)
 async def send_channel(channel, message):
     channel = client.get_channel(channel)
     await channel.send(message)
 
-
 async def my_background_task():
     global stop
     await client.wait_until_ready()
-
-    if stop == 0:
-        await send_dm("Hello!!!!")
-        await asyncio.sleep(1)
+    await send_dm("Hello!!!!")
+    await asyncio.sleep(1)
 
 
 async def send_dm(message):
@@ -97,15 +71,8 @@ async def get_channel_id(message):
 
 @client.event
 async def on_ready():
-    text_channel_list = []
-    for guild in client.guilds:
-        for channel in guild.text_channels:
-            text_channel_list.append(channel)
-
-    print(text_channel_list)
     print('Logged in as {0.user}'.format(client))
     client.loop.create_task(my_background_task())
-    # Send a DM right away when the bot is ready
     await client.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.playing, name="Slova je zakon!"))
     await asyncio.sleep(1)
     print("status urejen")
@@ -128,7 +95,7 @@ async def send_meme(channel, message):
             await channel.send(embed=embed)
 
 async def bot_sleep(time,message):
-    #await asyncio.sleep(1)
+    await asyncio.sleep(1)
     async with message.channel.typing():
             await asyncio.sleep(time)
 
@@ -146,12 +113,12 @@ async def on_message(message):
     channel = message.channel.id
     print(channel)
     print(message.content)
-    # Ignore messages sent by the bot itself
     if message.author == client.user:
         return
     # Respond with a custom message if a specific phrase is mentioned in the message
     if 'maj.' in message.content.lower():
         await message.channel.send(f'Govorim o {message.author.mention}!')
+        bot_sleep(3, message)
         print("omenil sem maja")
     elif "/meme-me" in message.content.lower():
         await bot_sleep(3,message)
@@ -164,17 +131,15 @@ async def on_message(message):
         print("message izbran")
         await send_channel(channel, message)    
     elif "/spam" in message.content.lower():
+            bot_sleep(3, message)
             message=" "
             uporabnik=str(message.content.split(" ")[2])
             stevilo=str(message.content.split(" ")[3])
             for i in range(0, stevilo): 
                 sporočilce=message + (f"<@{uporabnik}>") + "\n"
 
-    elif '/nadaljuj' in message.content.lower():
-        await message.channel.send('začenjam')
-        print("začenjam")
-        stop = 0
     elif "/pojdi k jakatu" in message.content.lower():
+        bot_sleep(3, message)
         await send_dm("**Adijos amigos!**")
         USER_ID = JAKA
         await send_dm("Hello my friend. I'm here to meme you. Use /meme-me to get memes.")
@@ -186,14 +151,16 @@ async def on_message(message):
         await send_dm("**Adijos amigos!**")
         USER_ID = URBAN
     elif "/čas" in message.content.lower():  
+        bot_sleep(3, message)
         await send_dm(f"Čas je {datetime.today()}")
         print(datetime.today())
     elif "/spam me" in message.content.lower():
+        bot_sleep(3, message)
+        USER_ID = message.author.id
         await send_spam(USER_ID)
         print("sent spam")
     elif "/spamaj" in message.content.lower():
+        bot_sleep(3, message)
         print("spamanje")
-
-
 
 client.run(TOKEN)
