@@ -9,8 +9,11 @@ from discord.ext import commands
 datetime.today()
 import os
 
-intents = discord.Intents(members=True)
-client = commands.Bot(command_prefix="!", intents=intents)
+intents = discord.Intents().all()
+intents.members= True
+
+client = discord.Client(intents=intents)
+
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -34,11 +37,12 @@ JERNEJ = os.getenv("JERNEJ")
 MATIJA = os.getenv("MATIJA")
 LIN = os.getenv("LIN")
 VAL = os.getenv("VAL")
+JAKA = os.getenv("JAKA")
+URBAN = os.getenv("URBAN")
 
 SERVER = os.getenv("g1a")
 CHANNEL = os.getenv("spam")
 
-client = discord.Client(intents=discord.Intents.default())
 
 async def send_message(server, channel):
     server = client.get_guild(server)
@@ -93,6 +97,12 @@ async def get_channel_id(message):
 
 @client.event
 async def on_ready():
+    text_channel_list = []
+    for guild in client.guilds:
+        for channel in guild.text_channels:
+            text_channel_list.append(channel)
+
+    print(text_channel_list)
     print('Logged in as {0.user}'.format(client))
     client.loop.create_task(my_background_task())
     # Send a DM right away when the bot is ready
@@ -109,13 +119,21 @@ async def send_meme(channel):
     embed = discord.Embed(title="", description="")
 
     async with aiohttp.ClientSession() as cs:
-        async with cs.get('https://www.reddit.com/r/dankmemes/new.json?sort=hot') as r:
+        async with cs.get('https://www.reddit.com/r/terriblefacebookmemes/hot.json?sort=hot') as r:
             res = await r.json()
             embed.set_image(url=res['data']['children'][random.randint(0, 25)]['data']['url'])
+            print(channel)
             await channel.send(embed=embed)
+
+async def bot_sleep(time,message):
+    await asyncio.sleep(1)
+    async with message.channel.typing():
+            await asyncio.sleep(time)
 
 @client.event
 async def on_message(message):
+    print(message)
+    lin=message.channel
     global stop, USER_ID
     channel = client.get_channel(message.channel.id)
     print(message.content)
@@ -123,17 +141,35 @@ async def on_message(message):
     if message.author == client.user:
         return
     # Respond with a custom message if a specific phrase is mentioned in the message
-    if 'maj' in message.content.lower():
+    if 'maj.' in message.content.lower():
         await message.channel.send(f'Govorim o {message.author.mention}!')
         print("omenil sem maja")
     elif "/meme-me" in message.content.lower():
+        await bot_sleep(3,message)
         await send_meme(channel)
+    elif isinstance(message, discord.Message):
+        if "/spam" in message.content.lower():
+            message=" "
+            uporabnik=str(message.content.split(" ")[2])
+            stevilo=str(message.content.split(" ")[3])
+            for i in range(0, stevilo): 
+                sporočilce=message + (f"<@{uporabnik}>") + "\n"
 
     elif '/nadaljuj' in message.content.lower():
-        await message.channel.send(f'začenjam')
+        await message.channel.send('začenjam')
         print("začenjam")
         stop = 0
-
+    elif "/pojdi k jakatu" in message.content.lower():
+        await send_dm("**Adijos amigos!**")
+        USER_ID = JAKA
+        await send_dm("Hello my friend. I'm here to meme you. Use /meme-me to get memes.")
+    elif "/pojdi k maju" in message.content.lower():
+        await send_dm("**Adijos amigos!**")
+        USER_ID = MAJ
+        await send_dm("Hello my friend. I'm here to meme you. Use /meme-me to get memes.")
+    elif "/pojdi k urbanu" in message.content.lower():
+        await send_dm("**Adijos amigos!**")
+        USER_ID = URBAN
     elif "/čas" in message.content.lower():  
         await send_dm(f"Čas je {datetime.today()}")
         print(datetime.today())
