@@ -50,7 +50,7 @@ async def get_sender_id(message):
     print(sender_id)
     return sender_id
 
-async def send_spam(user):
+async def send_spam(user, channel):
     print("trying to spam")
     message=""
     #Naredi neko spotročilo, ki ga potem pošlje
@@ -60,7 +60,7 @@ async def send_spam(user):
         message+=stvar_za_prilepit + "\n"
     print(message)
     user = await client.fetch_user(user)
-    await user.send(message)
+    await channel.send(message)
     print("sent spam")
    
 async def get_channel_id(message):
@@ -84,14 +84,44 @@ async def send_channel(channel, message):
     await channel.send(message)
 
 async def send_meme(channel, message):
-    description = (f"<@{message.author.id}>")
+    reddit_api = ["https://www.reddit.com/r/memes/hot.json?sort=hot", "https://www.reddit.com/r/terriblefacebookmemes/new.json?sort=hot", "https://www.reddit.com/r/ProgrammerHumor/hot.json?sort=hot", "https://www.reddit.com/r/HistoryMemes/hot.json?sort=hot", "https://www.reddit.com/r/traaaaaaannnnnnnnnns/hot.json?sort=hot", "https://www.reddit.com/r/Funnymemes/hot.json?sort=hot", "https://www.reddit.com/r/MinecraftMemes/hot.json?sort=hot", "https://www.reddit.com/r/AnarchyChess/hot.json?sort=hot", "https://www.reddit.com/r/PhotoAppleMemes/hot.json?sort=hot", "https://www.reddit.com/r/SAMSUNG_meme/hot.json?sort=hot"]
+    izbira = random.choice(reddit_api)
+    if izbira =="https://www.reddit.com/r/memes/hot.json?sort=hot":
+        ime_meme = "classic meme"
+    elif izbira == "https://www.reddit.com/r/terriblefacebookmemes/new.json?sort=hot":
+        ime_meme = "terrible facebook meme"
+    elif izbira == "https://www.reddit.com/r/ProgrammerHumor/hot.json?sort=hot":
+        ime_meme = "programmer meme"
+    elif izbira == "https://www.reddit.com/r/HistoryMemes/hot.json?sort=hot":
+        ime_meme = "history meme"
+    elif izbira == "https://www.reddit.com/r/traaaaaaannnnnnnnnns/hot.json?sort=hot":
+        ime_meme = "trans meme"
+    elif izbira == "https://www.reddit.com/r/Funnymemes/hot.json?sort=hot":
+        ime_meme = "funny meme"
+    elif izbira == "https://www.reddit.com/r/MinecraftMemes/hot.json?sort=hot":
+        ime_meme = "minecraft meme"
+    elif izbira == "https://www.reddit.com/r/AnarchyChess/hot.json?sort=hot":
+        ime_meme = "chess meme"
+    elif izbira == "https://www.reddit.com/r/PhotoAppleMemes/hot.json?sort=hot":
+        izbira ="apple meme"
+    elif izbira == "https://www.reddit.com/r/SAMSUNG_meme/hot.json?sort=hot":
+        ime_meme = "samsung meme"
+    description = (f"<@{message.author.id}> tukaj je tvoj "+ ime_meme+ ".")
     embed = discord.Embed(title="Meme", description=description)
 
     async with aiohttp.ClientSession() as cs:
-        async with cs.get('https://www.reddit.com/r/terriblefacebookmemes/hot.json?sort=hot') as r:
+        async with cs.get(izbira) as r:
             res = await r.json()
-            embed.set_image(url=res['data']['children'][random.randint(0, 25)]['data']['url'])
-            print(channel)
+            data = res['data']['children'][random.randint(0, 25)]['data']
+            if data['post_hint'] == 'image':
+                embed.set_image(url=data['url'])
+            elif data['post_hint'] == 'hosted:video':
+                embed.set_video(url=data['media']['reddit_video']['fallback_url'])
+                embed.video.height = data['media']['reddit_video']['height']
+                embed.video.width = data['media']['reddit_video']['width']
+            else:
+                # handle other post hints, such as link or rich:video
+                pass
             await channel.send(embed=embed)
 
 async def bot_sleep(time,message):
@@ -109,34 +139,38 @@ async def send_8ball(channel):
 async def on_message(message):
     print(message)
     lin=message.channel
+    cajt=message.channel
     global stop, USER_ID
     channel = message.channel.id
     print(channel)
     print(message.content)
+    channel = message.channel
+    #await client.http.delete_message(1047815957327925309, 1084469519831011459)
     if message.author == client.user:
         return
+    
     # Respond with a custom message if a specific phrase is mentioned in the message
-    if 'maj.' in message.content.lower():
+    if 'maj' in message.content.lower():
         await message.channel.send(f'Govorim o {message.author.mention}!')
         bot_sleep(3, message)
         print("omenil sem maja")
     elif "/meme-me" in message.content.lower():
         await bot_sleep(3,message)
+        await message.delete()
         await send_meme(message.channel, message)
-
     elif "/ask-me" in message.content.lower():
         await bot_sleep(3, message)
         seznam_odzivov = ["Eroor 404", "It is certain.", "It is decidely so.", "Without a doubt.", "Yes, definetly.", "You may rely on it", "A I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Sign point yes.", "Reply hazy, try again.", "Ask again later.", "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtfull."]
         message = random.choice(seznam_odzivov)
         print("message izbran")
         await send_channel(channel, message)    
-    elif "/spam" in message.content.lower():
-            bot_sleep(3, message)
-            message=" "
-            uporabnik=str(message.content.split(" ")[2])
-            stevilo=str(message.content.split(" ")[3])
-            for i in range(0, stevilo): 
-                sporočilce=message + (f"<@{uporabnik}>") + "\n"
+    #elif "/spam" in message.content.lower():
+            #bot_sleep(3, message)
+            #message=" "
+            #uporabnik=str(message.content.split(" ")[2])
+            #stevilo=str(message.content.split(" ")[3])
+            #for i in range(0, stevilo): 
+                #sporočilce=message + (f"<@{uporabnik}>") + "\n"
 
     elif "/pojdi k jakatu" in message.content.lower():
         bot_sleep(3, message)
@@ -152,12 +186,13 @@ async def on_message(message):
         USER_ID = URBAN
     elif "/čas" in message.content.lower():  
         bot_sleep(3, message)
-        await send_dm(f"Čas je {datetime.today()}")
+        mesič=(f"Čas je {datetime.today()}")
+        await send_channel(mesič, cajt)   
         print(datetime.today())
-    elif "/spam me" in message.content.lower():
+    elif "/spam-me" in message.content.lower():
         bot_sleep(3, message)
         USER_ID = message.author.id
-        await send_spam(USER_ID)
+        await send_spam(USER_ID, cajt)
         print("sent spam")
     elif "/spamaj" in message.content.lower():
         bot_sleep(3, message)
