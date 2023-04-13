@@ -78,13 +78,12 @@ async def get_channel_id(message):
 async def on_ready():
     print('Logged in as {0.user}'.format(client))
     client.loop.create_task(my_background_task())
-    await client.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.playing, name="Slova je zakon!"))
+    await client.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.playing, name="/help-me and Slova je zakon!"))
     await asyncio.sleep(1)
     print("status urejen")
 
 @client.event
 async def send_channel(channel, message):
-    channel = message.get_channel(channel)
     print(channel, message)
     await channel.send(message)
 
@@ -145,7 +144,7 @@ async def send_8ball(channel):
 @client.event
 async def on_message(message):
     print(message)
-    lin=message.channel
+    lin=message.content
     cajt=message.channel
     global stop, USER_ID
     channel = message.channel.id
@@ -167,37 +166,41 @@ async def on_message(message):
     elif stop == 1:
         await asyncio.sleep(10)
     elif stop == 0 :
-        if message.content.lower() == "/help":
+        if message.content.lower() == "/help-me":
             embed = discord.Embed(title='Command List', color=0xffa500)
             embed.add_field(name='/meme-me', value='Generates a random meme', inline=False)
             embed.add_field(name='/spam-me', value='Sends multiple spam messages', inline=False)
-            embed.add_field(name='/ask-me', value='Answers a random question', inline=False)
+            embed.add_field(name='/ask-me', value='Answers a random question.', inline=False)
             await message.channel.send(embed=embed)
 
         if 'maj' in message.content.lower():
             await message.channel.send(f'Govorim o {message.author.mention}!')
-            bot_sleep(3, message)
+            await bot_sleep(3, message)
             print("omenil sem maja")
         elif "/meme-me" in message.content.lower():
             await bot_sleep(3,message)
             await message.delete()
             await send_meme(message.channel, message)
-        elif "/ask-me" in message.content.lower():
+        elif "/ask-me:" in message.content.lower():
+            lin = str(message.content.split(":")[1])
             await bot_sleep(3, message)
             seznam_odzivov = ["Eroor 404", "It is certain.", "It is decidely so.", "Without a doubt.", "Yes, definetly.", "You may rely on it", "A I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Sign point yes.", "Reply hazy, try again.", "Ask again later.", "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtfull."]
-            message = random.choice(seznam_odzivov)
+            message_to_send = random.choice(seznam_odzivov)
             print("message izbran")
-            await send_channel(channel, message)    
-        elif message.content.startswith("/spam"):
-                bot_sleep(3, message)
-                message=" "
-                uporabnik=message.content.split(" ")[:1]
-                stevilo=message.content.split(" ")[:2]
-                for i in range(0, stevilo): 
-                    sporočilce=message + (f"<@{uporabnik}>") + "\n"
-                await channel.send(message)
+            embed = discord.Embed(title=lin, color=0xffa500)
+            embed.add_field(name='Answer:', value= message_to_send, inline=False)
+            await message.channel.send(embed=embed)   
+            await message.delete()
+        #elif message.content.startswith("/spam"):
+                # await bot_sleep(3, message)
+                #message=" "
+                #uporabnik=message.content.split(" ")[:1]
+                #stevilo=message.content.split(" ")[:2]
+                #for i in range(0, stevilo): 
+                    #sporočilce=message + (f"<@{uporabnik}>") + "\n"
+                #await channel.send(message)
         elif "/pojdi k jakatu" in message.content.lower():
-            bot_sleep(3, message)
+            await bot_sleep(3, message)
             await send_dm("**Adijos amigos!**")
             USER_ID = JAKA
             await send_dm("Hello my friend. I'm here to meme you. Use /meme-me to get memes.")
@@ -209,17 +212,25 @@ async def on_message(message):
             await send_dm("**Adijos amigos!**")
             USER_ID = URBAN
         elif "/čas" in message.content.lower():  
-            bot_sleep(3, message)
+            await bot_sleep(3, message)
             mesič=(f"Čas je {datetime.today()}")
-            await send_channel(mesič, cajt)   
+            await send_channel(message.channel, mesič)   
             print(datetime.today())
         elif "/spam-me" in message.content.lower():
-            bot_sleep(3, message)
+            await bot_sleep(3, message)
             USER_ID = message.author.id
             await send_spam(USER_ID, cajt)
+            await message.delete()
             print("sent spam")
-        elif "/spamaj" in message.content.lower():
-            bot_sleep(3, message)
+        elif "/pošlji-manual" in message.content.lower():
+            await bot_sleep(3, message)
             print("spamanje")
+            embed = discord.Embed(title='Command List', color=0xffa500)
+            embed.add_field(name='/meme-me', value='Generates a random meme', inline=False)
+            embed.add_field(name='/spam-me', value='Sends multiple spam messages', inline=False)
+            embed.add_field(name='/ask-me', value='Answers a random question.', inline=False)
+            embed.add_field(name='/help-me', value='Shows this menu.', inline=False)
+            await message.channel.send(embed=embed)
+            await client.http.delete_message(1017856047530131477, 1096095701819203584)
 
 client.run(TOKEN)
