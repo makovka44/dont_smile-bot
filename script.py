@@ -185,12 +185,15 @@ async def on_message(message):
             await send_meme(message.channel, message)
         elif "/ask-me: " in message.content.lower():
             lin = str(message.content.split(":")[1])
+            avtor = str(f"{message.author}")
+            avtor_send = "By "+ str(avtor.split("#")[0])
             await bot_sleep(3, message)
             seznam_odzivov = ["Eroor 404", "It is certain.", "It is decidely so.", "Without a doubt.", "Yes, definetly.", "You may rely on it", "A I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Sign point yes.", "Reply hazy, try again.", "Ask again later.", "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtfull."]
             message_to_send = random.choice(seznam_odzivov)
             print("message izbran")
             embed = discord.Embed(title=lin, color=0xffa500)
             embed.add_field(name='Answer:', value= message_to_send, inline=False)
+            embed.add_field(name="", value= avtor_send, inline=False)
             await message.channel.send(embed=embed)   
             await message.delete()
         elif "/pojdi k jakatu" in message.content.lower():
@@ -225,8 +228,13 @@ async def on_message(message):
                 message_to_send+=stvar_za_prilepit + "\n"
             avtor = str(f"{message.author}")
             message_to_send+= "By "+ str(avtor.split("#")[0])
+            await bot_sleep(3, message)
             await channel.send(message_to_send)
-        elif "/pošlji-manual" in message.content.lower():
+        """elif message.content.startswith("/custom"):
+            await client.http.delete_message(1089284998646997053, 1096110459633025176)
+            await client.http.delete_message(1089284998646997053, 1096111341095370772)
+            await message.delete()"""
+        """elif "/pošlji-manual" in message.content.lower():
             await bot_sleep(3, message)
             print("spamanje")
             embed = discord.Embed(title='Die Liste', color=0xffa500)
@@ -236,6 +244,6 @@ async def on_message(message):
             embed.add_field(name='/help-me', value='Shows this menu.', inline=False)
             embed.add_field(name="/spam-c", value='Spams c=> custom.', inline=False)
             await message.channel.send(embed=embed)
-            await client.http.delete_message(1017856047530131477, 1096106755118874696)
+            await client.http.delete_message(1017856047530131477, 1096106755118874696)"""
 
 client.run(TOKEN)
