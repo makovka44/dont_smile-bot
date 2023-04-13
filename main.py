@@ -1,33 +1,21 @@
-import discord
+"""import discord
 
 
 import os
 from dotenv import load_dotenv()
+from discord.ext import commands
 
 
-load_dotenv()
-TOKEN = os.getenv("moj_token")
-
-intents = discord.Intents.default()
-intents.members = True
-client = discord.Client(intents=intents)
-
-import discord
-import random
+bot = commands.Bot(command_prefix='$')
 
 
-@client.event
-async def on_ready():
-    print('Logged in as {0.user}'.format(client))
-
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
+@bot.command(description="Sends the bot's latency.") # this decorator makes a slash command
+async def ping(ctx): # a slash command will be created with the name "ping"
+    await ctx.respond(f"Pong! Latency is {bot.latency}")
     
-    sporocilo=message.content
-    
-  
 
-client.run(TOKEN)
+bot.run("TOKEN")"""
 
+seznamA=[("to je minecraft meme :-)", "www.reddit..."), ("to je dorian meme", "www.google.com")]
+
+print

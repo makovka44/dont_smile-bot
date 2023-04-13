@@ -4,10 +4,11 @@ import aiohttp
 import random
 
 from datetime import datetime
-from discord.ext import commands
+
 
 datetime.today()
 import os
+stop = 0
 
 intents = discord.Intents().all()
 intents.members= True
@@ -45,6 +46,10 @@ async def send_dm(message):
     user = await client.fetch_user(USER_ID)
     await user.send(message)
 
+async def send_dm2(user, message):
+    user = await client.fetch_user(user)
+    await user.send(message)
+
 async def get_sender_id(message):
     sender_id = message.author.id
     print(sender_id)
@@ -79,12 +84,12 @@ async def on_ready():
 
 @client.event
 async def send_channel(channel, message):
-    channel = client.get_channel(channel)
+    channel = message.get_channel(channel)
     print(channel, message)
     await channel.send(message)
 
 async def send_meme(channel, message):
-    reddit_api = ["https://www.reddit.com/r/memes/hot.json?sort=hot", "https://www.reddit.com/r/terriblefacebookmemes/new.json?sort=hot", "https://www.reddit.com/r/ProgrammerHumor/hot.json?sort=hot", "https://www.reddit.com/r/HistoryMemes/hot.json?sort=hot", "https://www.reddit.com/r/traaaaaaannnnnnnnnns/hot.json?sort=hot", "https://www.reddit.com/r/Funnymemes/hot.json?sort=hot", "https://www.reddit.com/r/MinecraftMemes/hot.json?sort=hot", "https://www.reddit.com/r/AnarchyChess/hot.json?sort=hot", "https://www.reddit.com/r/PhotoAppleMemes/hot.json?sort=hot", "https://www.reddit.com/r/SAMSUNG_meme/hot.json?sort=hot"]
+    reddit_api = ["https://www.reddit.com/r/memes/hot.json?sort=hot", "https://www.reddit.com/r/terriblefacebookmemes/new.json?sort=hot", "https://www.reddit.com/r/ProgrammerHumor/hot.json?sort=hot", "https://www.reddit.com/r/HistoryMemes/hot.json?sort=hot", "https://www.reddit.com/r/traaaaaaannnnnnnnnns/hot.json?sort=hot", "https://www.reddit.com/r/Funnymemes/hot.json?sort=hot", "https://www.reddit.com/r/MinecraftMemes/hot.json?sort=hot", "https://www.reddit.com/r/AnarchyChess/hot.json?sort=hot", "https://www.reddit.com/r/PrequelMemes/new.json?sort=hot", "https://www.reddit.com/r/dadjokes/new.json?sort=hot"]
     izbira = random.choice(reddit_api)
     if izbira =="https://www.reddit.com/r/memes/hot.json?sort=hot":
         ime_meme = "classic meme"
@@ -102,11 +107,12 @@ async def send_meme(channel, message):
         ime_meme = "minecraft meme"
     elif izbira == "https://www.reddit.com/r/AnarchyChess/hot.json?sort=hot":
         ime_meme = "chess meme"
-    elif izbira == "https://www.reddit.com/r/PhotoAppleMemes/hot.json?sort=hot":
-        izbira ="apple meme"
-    elif izbira == "https://www.reddit.com/r/SAMSUNG_meme/hot.json?sort=hot":
-        ime_meme = "samsung meme"
+    elif izbira == "https://www.reddit.com/r/PrequelMemes/new.json?sort=hot":
+        ime_meme = "random meme"
+    elif izbira == "https://www.reddit.com/r/dadjokes/new.json?sort=hot":
+        ime_meme = "dad joke"
     description = (f"<@{message.author.id}> tukaj je tvoj "+ ime_meme+ ".")
+    print(izbira)
     embed = discord.Embed(title="Meme", description=description)
 
     async with aiohttp.ClientSession() as cs:
@@ -116,6 +122,7 @@ async def send_meme(channel, message):
             if data['post_hint'] == 'image':
                 embed.set_image(url=data['url'])
             elif data['post_hint'] == 'hosted:video':
+                embed.set_image(url=data['thumbnail'])
                 embed.set_video(url=data['media']['reddit_video']['fallback_url'])
                 embed.video.height = data['media']['reddit_video']['height']
                 embed.video.width = data['media']['reddit_video']['width']
@@ -145,57 +152,74 @@ async def on_message(message):
     print(channel)
     print(message.content)
     channel = message.channel
-    #await client.http.delete_message(1047815957327925309, 1084469519831011459)
+    #await client.http.delete_message(1015198933737291894, 1095783029047316530)
     if message.author == client.user:
         return
     
-    # Respond with a custom message if a specific phrase is mentioned in the message
-    if 'maj' in message.content.lower():
-        await message.channel.send(f'Govorim o {message.author.mention}!')
-        bot_sleep(3, message)
-        print("omenil sem maja")
-    elif "/meme-me" in message.content.lower():
-        await bot_sleep(3,message)
-        await message.delete()
-        await send_meme(message.channel, message)
-    elif "/ask-me" in message.content.lower():
-        await bot_sleep(3, message)
-        seznam_odzivov = ["Eroor 404", "It is certain.", "It is decidely so.", "Without a doubt.", "Yes, definetly.", "You may rely on it", "A I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Sign point yes.", "Reply hazy, try again.", "Ask again later.", "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtfull."]
-        message = random.choice(seznam_odzivov)
-        print("message izbran")
-        await send_channel(channel, message)    
-    #elif "/spam" in message.content.lower():
-            #bot_sleep(3, message)
-            #message=" "
-            #uporabnik=str(message.content.split(" ")[2])
-            #stevilo=str(message.content.split(" ")[3])
-            #for i in range(0, stevilo): 
-                #sporočilce=message + (f"<@{uporabnik}>") + "\n"
+    if message.content.startswith("/stopaj_svojo_kodo"):
+        await send_dm2(MAJ, "Stopana koda.")
+        print("stopan")
+        stop = 1
+    if message.content.startswith("/nadaljuj_svojo_kodo"):
+        stop = 0
+        print("nadaljujem")
+        await send_dm2(MAJ, "nadaljujem kodo.")
+    elif stop == 1:
+        await asyncio.sleep(10)
+    elif stop == 0 :
+        if message.content.lower() == "/help":
+            embed = discord.Embed(title='Command List', color=0xffa500)
+            embed.add_field(name='/meme-me', value='Generates a random meme', inline=False)
+            embed.add_field(name='/spam-me', value='Sends multiple spam messages', inline=False)
+            embed.add_field(name='/ask-me', value='Answers a random question', inline=False)
+            await message.channel.send(embed=embed)
 
-    elif "/pojdi k jakatu" in message.content.lower():
-        bot_sleep(3, message)
-        await send_dm("**Adijos amigos!**")
-        USER_ID = JAKA
-        await send_dm("Hello my friend. I'm here to meme you. Use /meme-me to get memes.")
-    elif "/pojdi k maju" in message.content.lower():
-        await send_dm("**Adijos amigos!**")
-        USER_ID = MAJ
-        await send_dm("Hello my friend. I'm here to meme you. Use /meme-me to get memes.")
-    elif "/pojdi k urbanu" in message.content.lower():
-        await send_dm("**Adijos amigos!**")
-        USER_ID = URBAN
-    elif "/čas" in message.content.lower():  
-        bot_sleep(3, message)
-        mesič=(f"Čas je {datetime.today()}")
-        await send_channel(mesič, cajt)   
-        print(datetime.today())
-    elif "/spam-me" in message.content.lower():
-        bot_sleep(3, message)
-        USER_ID = message.author.id
-        await send_spam(USER_ID, cajt)
-        print("sent spam")
-    elif "/spamaj" in message.content.lower():
-        bot_sleep(3, message)
-        print("spamanje")
+        if 'maj' in message.content.lower():
+            await message.channel.send(f'Govorim o {message.author.mention}!')
+            bot_sleep(3, message)
+            print("omenil sem maja")
+        elif "/meme-me" in message.content.lower():
+            await bot_sleep(3,message)
+            await message.delete()
+            await send_meme(message.channel, message)
+        elif "/ask-me" in message.content.lower():
+            await bot_sleep(3, message)
+            seznam_odzivov = ["Eroor 404", "It is certain.", "It is decidely so.", "Without a doubt.", "Yes, definetly.", "You may rely on it", "A I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Sign point yes.", "Reply hazy, try again.", "Ask again later.", "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtfull."]
+            message = random.choice(seznam_odzivov)
+            print("message izbran")
+            await send_channel(channel, message)    
+        elif message.content.startswith("/spam"):
+                bot_sleep(3, message)
+                message=" "
+                uporabnik=message.content.split(" ")[:1]
+                stevilo=message.content.split(" ")[:2]
+                for i in range(0, stevilo): 
+                    sporočilce=message + (f"<@{uporabnik}>") + "\n"
+                await channel.send(message)
+        elif "/pojdi k jakatu" in message.content.lower():
+            bot_sleep(3, message)
+            await send_dm("**Adijos amigos!**")
+            USER_ID = JAKA
+            await send_dm("Hello my friend. I'm here to meme you. Use /meme-me to get memes.")
+        elif "/pojdi k maju" in message.content.lower():
+            await send_dm("**Adijos amigos!**")
+            USER_ID = MAJ
+            await send_dm("Hello my friend. I'm here to meme you. Use /meme-me to get memes.")
+        elif "/pojdi k urbanu" in message.content.lower():
+            await send_dm("**Adijos amigos!**")
+            USER_ID = URBAN
+        elif "/čas" in message.content.lower():  
+            bot_sleep(3, message)
+            mesič=(f"Čas je {datetime.today()}")
+            await send_channel(mesič, cajt)   
+            print(datetime.today())
+        elif "/spam-me" in message.content.lower():
+            bot_sleep(3, message)
+            USER_ID = message.author.id
+            await send_spam(USER_ID, cajt)
+            print("sent spam")
+        elif "/spamaj" in message.content.lower():
+            bot_sleep(3, message)
+            print("spamanje")
 
 client.run(TOKEN)
