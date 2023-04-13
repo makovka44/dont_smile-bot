@@ -151,7 +151,7 @@ async def on_message(message):
     print(channel)
     print(message.content)
     channel = message.channel
-    #await client.http.delete_message(1015198933737291894, 1095783029047316530)
+    #await client.http.delete_message(1015198933737291894, 1096100326202949683)
     if message.author == client.user:
         return
     
@@ -167,10 +167,12 @@ async def on_message(message):
         await asyncio.sleep(10)
     elif stop == 0 :
         if message.content.lower() == "/help-me":
-            embed = discord.Embed(title='Command List', color=0xffa500)
+            embed = discord.Embed(title='Die Liste', color=0xffa500)
             embed.add_field(name='/meme-me', value='Generates a random meme', inline=False)
             embed.add_field(name='/spam-me', value='Sends multiple spam messages', inline=False)
             embed.add_field(name='/ask-me', value='Answers a random question.', inline=False)
+            embed.add_field(name='/help-me', value='Shows this menu.', inline=False)
+            embed.add_field(name="/spam-c", value='Spams c=> custom.', inline=False)
             await message.channel.send(embed=embed)
 
         if 'maj' in message.content.lower():
@@ -181,7 +183,7 @@ async def on_message(message):
             await bot_sleep(3,message)
             await message.delete()
             await send_meme(message.channel, message)
-        elif "/ask-me:" in message.content.lower():
+        elif "/ask-me: " in message.content.lower():
             lin = str(message.content.split(":")[1])
             await bot_sleep(3, message)
             seznam_odzivov = ["Eroor 404", "It is certain.", "It is decidely so.", "Without a doubt.", "Yes, definetly.", "You may rely on it", "A I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Sign point yes.", "Reply hazy, try again.", "Ask again later.", "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtfull."]
@@ -191,14 +193,6 @@ async def on_message(message):
             embed.add_field(name='Answer:', value= message_to_send, inline=False)
             await message.channel.send(embed=embed)   
             await message.delete()
-        #elif message.content.startswith("/spam"):
-                # await bot_sleep(3, message)
-                #message=" "
-                #uporabnik=message.content.split(" ")[:1]
-                #stevilo=message.content.split(" ")[:2]
-                #for i in range(0, stevilo): 
-                    #sporočilce=message + (f"<@{uporabnik}>") + "\n"
-                #await channel.send(message)
         elif "/pojdi k jakatu" in message.content.lower():
             await bot_sleep(3, message)
             await send_dm("**Adijos amigos!**")
@@ -222,15 +216,26 @@ async def on_message(message):
             await send_spam(USER_ID, cajt)
             await message.delete()
             print("sent spam")
+        elif message.content.startswith("/spam-c "):
+            user = int(message.content.split(" ")[1])
+            stevilka = int(message.content.split(" ")[2])
+            message_to_send = " "
+            for i in range(1, stevilka):
+                stvar_za_prilepit=f"<@{user}>"
+                message_to_send+=stvar_za_prilepit + "\n"
+            avtor = str(f"{message.author}")
+            message_to_send+= "By "+ str(avtor.split("#")[0])
+            await channel.send(message_to_send)
         elif "/pošlji-manual" in message.content.lower():
             await bot_sleep(3, message)
             print("spamanje")
-            embed = discord.Embed(title='Command List', color=0xffa500)
-            embed.add_field(name='/meme-me', value='Generates a random meme', inline=False)
-            embed.add_field(name='/spam-me', value='Sends multiple spam messages', inline=False)
-            embed.add_field(name='/ask-me', value='Answers a random question.', inline=False)
+            embed = discord.Embed(title='Die Liste', color=0xffa500)
+            embed.add_field(name='/meme-me', value='Generates a random meme.', inline=False)
+            embed.add_field(name='/spam-me', value='Sends multiple spam messages.', inline=False)
+            embed.add_field(name='/ask-me: ', value='Answers a random question.', inline=False)
             embed.add_field(name='/help-me', value='Shows this menu.', inline=False)
+            embed.add_field(name="/spam-c", value='Spams c=> custom.', inline=False)
             await message.channel.send(embed=embed)
-            await client.http.delete_message(1017856047530131477, 1096095701819203584)
+            await client.http.delete_message(1017856047530131477, 1096106755118874696)
 
 client.run(TOKEN)
