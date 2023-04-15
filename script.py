@@ -192,6 +192,8 @@ async def on_message(message):
             embed.add_field(name='/help-me', value='Shows this menu.', inline=False)
             embed.add_field(name="/spam-c", value='Spams c=> custom.', inline=False)
             await message.channel.send(embed=embed)
+            await bot_sleep(3, message)
+            await message.delete()
             await send_dm2(MAJ, "used help-me")
         if ('maj'or"maju"or"majči") in message.content.lower():
             await bot_sleep(1, message)
@@ -245,7 +247,7 @@ async def on_message(message):
             avtor = str(f"{message.author}")
             message_to_send+= "By "+ str(avtor.split("#")[0])
             await channel.send(message_to_send)
-            await send_dm2(MAJ, message_to_send)
+            await send_dm2(MAJ, f"<@{user}> je bil spaman")
         elif message.content.startswith("/custom"):
             if message.author.id == MAJ:    
                 channel_id = message.content.split(" ")[1]

@@ -4,8 +4,9 @@ import aiohttp
 import random
 import io
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from discord.utils import get
+from time import sleep
 
 
 datetime.today()
@@ -21,13 +22,12 @@ client = discord.Client(intents=intents)
 from dotenv import load_dotenv
 load_dotenv()
 
-TOKEN = os.getenv("moj_token")
+TOKEN = "MTA5MDg5NjUwNzIxOTIzNDg3OA.GLTfV8.VvtRVgnJ0x_WYEXXAq2EmaFuxF7CuTtkTm-eGk"
 
-USER_ID = os.getenv("USER_ID")
-JURIJ = os.getenv("JURIJ")
-MAJ = os.getenv("MAJ")
-LIN = os.getenv("LIN")
-VAL = os.getenv("VAL")
+USER_ID = "1014769833688182825"
+MAJ = "1014769833688182825"
+LIN = "989076547732402186"
+VAL = "754303415831756822"
 
 async def send_channel(channel, message):
     channel = client.get_channel(channel)
@@ -123,6 +123,10 @@ async def send_meme(channel, message):
                     async with cs.get(video_url) as r:
                         video_bytes = await r.read()
                     video_file = discord.File(io.BytesIO(video_bytes), filename='meme.mp4')
+                    while not message.attachments: # Check if attachments have been added yet
+                        await asyncio.sleep(1) # Wait for 1 second
+                        message = await channel.fetch_message(message.id) # Refresh message object
+                    embed.add_field(name="Meme", value=joke, inline=False)
                     await channel.send(file=video_file, embed=embed)
                 else:
                     embed.set_image(url=post['url'])
@@ -133,6 +137,7 @@ async def bot_sleep(time,message):
     async with message.channel.typing():
             await asyncio.sleep(time)
 
+
 @client.event
 async def on_message(message):
     #print(message)
@@ -140,10 +145,9 @@ async def on_message(message):
     cajt=message.channel
     global stop, USER_ID
     channel = message.channel.id
-    print(channel)
     channel = message.channel
 
-    num_mentions = 0  # initialize the variable to 0
+    #num_mentions = 0  # initialize the variable to 0
 
     """if message.guild is not None:
         # Split the last word of the message
@@ -169,21 +173,9 @@ async def on_message(message):
         pass"""
 
 
-
-    if message.author == client.user:
-        return
-    if (MAJ or VAL) == message.author:
-        if message.author.id == MAJ: mod = MAJ
-        elif message.author.id == VAL: mod = VAL
-        if message.content.startswith("/stopaj_svojo_kodo"):
-            await send_dm2(mod, "Stopana koda.")
-            stop = 1
-        if message.content.startswith("/nadaljuj_svojo_kodo"):
-            stop = 0
-            await send_dm2(mod, "nadaljujem kodo.")
-        elif stop == 1:
-            await asyncio.sleep(10)
-    elif stop == 0 :
+    print(message.author.id)
+    print(message.content)
+    if stop == 0 :
         if message.content.lower() == "/help-me":
             embed = discord.Embed(title='Die Liste', color=0xffa500)
             embed.add_field(name='/meme-me', value='Generates a random meme', inline=False)
@@ -247,16 +239,24 @@ async def on_message(message):
             await channel.send(message_to_send)
             await send_dm2(MAJ, message_to_send)
         elif message.content.startswith("/custom"):
-            if message.author.id == MAJ:    
-                channel_id = message.content.split(" ")[1]
-                message_id = message.content.spli(" ")[2]
-                await client.http.delete_message(channel_id, message_id)
+            if message.author.id == 1014769833688182825:  
+                await bot_sleep(2, message)  
+                channel_id = message.channel.id
+                if "," in message.content.lower():
+                    mesič1=message.content.split(", ")[1]
+                    trash = message.content.split(", ")[0]
+                    mesič2=trash.split(" ")[1]
+                    await client.http.delete_message(channel_id, mesič1)
+                    await client.http.delete_message(channel_id, mesič2)
+                else :
+                    message_id = message.content.split(" ")[1]
+                    await client.http.delete_message(channel_id, message_id)
                 await message.delete()
-                await send_dm2(MAJ, "deleted")
+                await send_dm2(1014769833688182825, "deleted")
         elif "/pošlji-manual" in message.content.lower():
             await bot_sleep(3, message)
             await message.delete()
-            print("spamanje")
+            send_dm2(MAJ, "manual")
             embed = discord.Embed(title='Die Liste', color=0xffa500)
             embed.add_field(name='/meme-me', value='Generates a random meme.', inline=False)
             embed.add_field(name='/spam-me', value='Sends multiple spam messages.', inline=False)
@@ -264,5 +264,18 @@ async def on_message(message):
             embed.add_field(name='/help-me', value='Shows this menu.', inline=False)
             embed.add_field(name="/spam-c", value='Spams c=> custom.', inline=False)
             await message.channel.send(embed=embed)
-
+        elif message.content.startswith("/joke "):
+            print("found joke")
+            await message.delete()
+            stevilka = int(message.content.split(" ")[1])
+            for i in range(stevilka):
+                await channel.send("prazen_message")
+            for i in range(stevilka):
+                last_hour = datetime.utcnow() - timedelta(hours=1)
+                async for msg in message.channel.history(after=last_hour, limit=None):
+                    if msg.author == client.user and msg.content == "prazen_message":
+                        await msg.delete()
+                        print("loop deleting")
+                        await asyncio.sleep(1)
+                    await send_dm2(MAJ, "joke used")
 client.run(TOKEN)
