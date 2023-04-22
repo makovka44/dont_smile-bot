@@ -22,7 +22,7 @@ client = discord.Client(intents=intents)
 from dotenv import load_dotenv
 load_dotenv()
 
-TOKEN = "MTA5MDg5NjUwNzIxOTIzNDg3OA.GLTfV8.VvtRVgnJ0x_WYEXXAq2EmaFuxF7CuTtkTm-eGk"
+TOKEN = os.getenv("moj_token")
 
 USER_ID = "1014769833688182825"
 MAJ = "1014769833688182825"
@@ -171,26 +171,38 @@ async def on_message(message):
         await message.channel.send(f"<@{žrtev}> is no longer timed out.")
     else:
         pass"""
-
+    if message.author.id == MAJ:
+        if message.content == "/stop":
+            stop=1
+            await send_dm2(MAJ, "stopana koda")
+        elif message.content == "/nadaljuj":
+            stop = 0
+            await send_dm2(MAJ, "nadaljujem kodo")
 
     print(message.author.id)
     print(message.content)
     if stop == 0 :
         if message.content.lower() == "/help-me":
+            await message.delete()
+            await bot_sleep(3, message)
             embed = discord.Embed(title='Die Liste', color=0xffa500)
             embed.add_field(name='/meme-me', value='Generates a random meme', inline=False)
             embed.add_field(name='/spam-me', value='Sends multiple spam messages', inline=False)
             embed.add_field(name='/ask-me', value='Answers a random question.', inline=False)
             embed.add_field(name='/help-me', value='Shows this menu.', inline=False)
             embed.add_field(name="/spam-c", value='Spams c=> custom.', inline=False)
+            avtor = str(f"{message.author}")
+            message_to_send= "By "+ str(avtor.split("#")[0])
+            embed.add_field(name="Avtor:", value=message_to_send, inline=False)
             await message.channel.send(embed=embed)
             await send_dm2(MAJ, "used help-me")
-        if ('maj'or"maju"or"majči") in message.content.lower():
-            await bot_sleep(1, message)
-            avtor = str(f"{message.author}")
-            avtor_send = str(avtor.split("#")[0])
-            await message.channel.send(f"{avtor_send} govori o <@{MAJ}>!")
-            send_dm2(MAJ, "omenil sem maja")
+        if message.author != client.user and "maj " in message.content.lower() or " maj" in message.content.lower() or "majči" in message.content.lower() or " majči" in message.content.lower():
+                await bot_sleep(1, message)
+                avtor = str(f"{message.author}")
+                avtor_send = str(avtor.split("#")[0])
+                await message.reply(f"{avtor_send} govori o <@{MAJ}>!")
+        elif message.author == client.user:
+            pass
         elif "/meme-me" in message.content.lower():
             await bot_sleep(3,message)
             await message.delete()
@@ -277,5 +289,5 @@ async def on_message(message):
                         await msg.delete()
                         print("loop deleting")
                         await asyncio.sleep(1)
-                    await send_dm2(MAJ, "joke used")
+            await send_dm2(MAJ, "joke used")
 client.run(TOKEN)
