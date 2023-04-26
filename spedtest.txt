@@ -1,0 +1,9 @@
+2023-04-26 22:45:15: 
+  Download Speed: 188.17 Mbps
+  Upload Speed: 21.18 Mbps
+2023-04-26 22:46:26: 
+  Download Speed: 182.89 Mbps
+  Upload Speed: 20.63 Mbps
+2023-04-26 23:53:59: 
+  Download Speed: 191.57 Mbps
+  Upload Speed: 25.91 Mbps

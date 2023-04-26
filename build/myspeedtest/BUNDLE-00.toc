@@ -1,0 +1,3 @@
+([('myspeedtest',
+   '/Users/majmohar/Downloads/Dont_smile-bot/dist/myspeedtest',
+   'EXECUTABLE')],)

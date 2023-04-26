@@ -5,7 +5,7 @@ import random
 import io, os
 
 
-token= "MTA5NjgwNjUzMTA5MTE1Mjk3OQ.G9BOhN.flyDI2AE-fu_-v-X5-fFZTz-VtlkchOlEStVHc"
+token= os.getenv("moj_token")
 intents = discord.Intents().all()
 intents.members= True
 
