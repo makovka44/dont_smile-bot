@@ -5,7 +5,6 @@ import random
 import io
 
 from datetime import datetime, timedelta
-from discord.utils import get
 from time import sleep
 
 

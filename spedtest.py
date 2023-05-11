@@ -1,4 +1,4 @@
-import speedtest
+import myspeedtest
 from datetime import datetime
 import time
 now = datetime.now()
