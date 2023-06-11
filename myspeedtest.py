@@ -1,7 +1,7 @@
 import speedtest
 from datetime import datetime
 import tkinter as tk
-import tkinter as ttk
+from tkinter import ttk
 import time
 
 class LoadingScreen:
@@ -9,12 +9,15 @@ class LoadingScreen:
         self.master = master
         self.master.title("Loading")
         self.master.geometry("300x100")
-        self.progress_label = tk.Label(self.master, text="Loading speedtest...")
+        self.progress_label = tk.Label(self.master, text="Speedtest in progress...")
         self.progress_label.pack(pady=20)
-        self.progress_bar = tk.ttk.Progressbar(self.master, orient="horizontal", mode="indeterminate")
+        self.progress_bar = ttk.Progressbar(self.master, orient="horizontal", mode="indeterminate")
         self.progress_bar.pack(pady=10)
         self.progress_bar.start(10)
-
+    def destroy(self):
+        self.progress_bar.stop()
+        self.progress_bar.destroy()
+        self.progress_label.destroy()
 while True:
     now = datetime.now()
     formatted_date = now.strftime('%Y-%m-%d %H:%M:%S')  # format as 'YYYY-MM-DD HH:MM:SS'
@@ -25,12 +28,14 @@ while True:
             root = tk.Tk()
             loading_screen = LoadingScreen(root)
             root.mainloop() 
+            loading_screen.progress_label.config(text="Speedtest completed!")
             f.write(f"{formatted_date}: \n")
             st = speedtest.Speedtest()
             upload_speed = st.upload()
             download_speed = st.download() 
             f.write(f"  Download Speed: {download_speed / 1_000_000:.2f} Mbps\n")
             f.write(f"  Upload Speed: {upload_speed / 1_000_000:.2f} Mbps\n")
+            loading_screen.destroy()
             root = tk.Tk()
             root.title(f"The speedtest was completed. Here are the results: \n Download: {download_speed}Mbps\n Upload {upload_speed}Mbps")
             # Set the window size

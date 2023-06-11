@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import random
 import datetime, discord, os, dotenv, asyncio, calendar
 
@@ -5,8 +6,7 @@ intents = discord.Intents().all()
 intents.members= True
 
 client = discord.Client(intents=intents)
-
-TOKEN = "MTA5NjgwNjUzMTA5MTE1Mjk3OQ.GKfAdJ._wLCnsHeOpcTjzkGzrw80nwk1lVQpFOBFqKbug"
+TOKEN = "MTA5NjgwNjUzMTA5MTE1Mjk3OQ.GISh4_.nKlucH4amNg_qH6vN3X93ok1svTox0BOIJIZZE"
 
 # Add your quotes for each day of the week
 quote_lists = {

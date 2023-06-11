@@ -17,7 +17,6 @@ intents.members= True
 
 client = discord.Client(intents=intents)
 
-
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -35,7 +34,6 @@ async def send_channel(channel, message):
 async def my_background_task():
     global stop
     await client.wait_until_ready()
-    await send_dm("Online sem")
     await asyncio.sleep(1)
 
 
@@ -66,11 +64,17 @@ async def get_channel_id(message):
 
 @client.event
 async def on_ready():
-    await send_dm2(MAJ, 'Logged in as {0.user}'.format(client))
     client.loop.create_task(my_background_task())
     await client.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.playing, name="/help-me and Slova je zakon!"))
-    await asyncio.sleep(1)
-    await send_dm2(MAJ, "status urejen, sem pri juriju")
+    server_id = 1015198933737291887
+    new_nickname = "Maverick"
+
+    # Get the server and the bot's member object
+    server = client.get_guild(server_id)
+    member = server.get_member(client.user.id)
+
+    # Change the bot's nickname
+    await member.edit(nick=new_nickname)
 
 async def send_meme(channel, message):
     reddit_api = ["https://www.reddit.com/r/memes/hot.json?sort=hot", "https://www.reddit.com/r/terriblefacebookmemes/new.json?sort=hot", "https://www.reddit.com/r/ProgrammerHumor/hot.json?sort=hot", "https://www.reddit.com/r/HistoryMemes/hot.json?sort=hot", "https://www.reddit.com/r/traaaaaaannnnnnnnnns/hot.json?sort=hot", "https://www.reddit.com/r/Funnymemes/hot.json?sort=hot", "https://www.reddit.com/r/MinecraftMemes/hot.json?sort=hot", "https://www.reddit.com/r/AnarchyChess/hot.json?sort=hot", "https://www.reddit.com/r/PrequelMemes/new.json?sort=hot", "https://www.reddit.com/r/dadjokes/new.json?sort=hot", "https://www.reddit.com/r/Jokes/new.json?sort=hot"]
